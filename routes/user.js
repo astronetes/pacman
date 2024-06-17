@@ -29,15 +29,17 @@ router.get('/id', function(req, res, next) {
            w: 'majority',
            j: true,
            wtimeout: 10000
-        }, function(err, result) {
-           if (err) {
-               console.log('failed to insert new user ID err =', err);
-           } else {
-               userId = result.insertedId;
-               console.log('Successfully inserted new user ID = ', userId);
-           }
-
-           res.json(userId);
+        }).then((result) => {
+            // function(err, result) {
+       
+            userId = result.insertedId;
+            console.log('Successfully inserted new user ID = ', userId);
+            
+    
+            res.json(userId);
+             
+        }).catch(err => {
+            console.log('failed to insert new user ID err =', err);
         });
     });
 
@@ -83,21 +85,28 @@ router.post('/stats', urlencodedParser, function(req, res, next) {
                 w: 'majority',
                 j: true,
                 wtimeout: 10000
-            }, function(err, result) {
-                var returnStatus = '';
-
-                if (err) {
-                    console.log(err);
-                    returnStatus = 'error';
-                } else {
-                    console.log('Successfully updated user stats');
-                    returnStatus = 'success';
-                }
-
+            }).then(result => {
+                // function(err, result) {
+                    // var returnStatus = '';
+    
+            
+                console.log('Successfully updated user stats');
+                returnStatus = 'success';
+                    // }
+    
                 res.json({
                     rs: returnStatus
                 });
-        });
+            // }
+
+
+            }).catch(err => {
+                console.log(err);
+                var returnStatus = 'error';
+                res.json({
+                    rs: returnStatus
+                });
+            });
     });
 });
 
@@ -112,26 +121,30 @@ router.get('/stats', function(req, res, next) {
         // Find all elements where the score field exists to avoid
         // undefined values
         var col = db.collection('userstats');
-        col.find({ score: {$exists: true}}).sort([['_id', 1]]).toArray(function(err, docs) {
+        col.find({ score: {$exists: true}}).sort([['_id', 1]]).toArray((docs) => {
+
+            // function(err, docs) {
             var result = [];
-            if (err) {
-                console.log(err);
-            }
+
 
             docs.forEach(function(item, index, array) {
                 result.push({
-                                cloud: item['cloud'],
-                                zone: item['zone'],
-                                host: item['host'],
-                                score: item['score'],
-                                level: item['level'],
-                                lives: item['lives'],
-                                et: item['elapsedTime'],
-                                txncount: item['updateCounter']
+                    cloud: item['cloud'],
+                    zone: item['zone'],
+                    host: item['host'],
+                    score: item['score'],
+                    level: item['level'],
+                    lives: item['lives'],
+                    et: item['elapsedTime'],
+                    txncount: item['updateCounter']
                 });
             });
 
             res.json(result);
+            // }
+
+        }).catch(err => {
+            console.log(err);
         });
     });
 });

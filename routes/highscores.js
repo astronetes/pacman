@@ -21,11 +21,8 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
         // Retrieve the top 10 high scores
         var col = db.collection('highscore');
-        col.find({}).sort([['score', -1]]).limit(10).toArray(function(err, docs) {
+        col.find({}).sort([['score', -1]]).limit(10).toArray((docs) => {
             var result = [];
-            if (err) {
-                console.log(err);
-            }
 
             docs.forEach(function(item, index, array) {
                 result.push({ name: item['name'], cloud: item['cloud'],
@@ -34,7 +31,25 @@ router.get('/list', urlencodedParser, function(req, res, next) {
             });
 
             res.json(result);
+        }).catch((err) => {
+            console.log(err);
         });
+            
+            
+        //     function(err, docs) {
+        //     var result = [];
+        //     if (err) {
+        //         console.log(err);
+        //     }
+
+        //     docs.forEach(function(item, index, array) {
+        //         result.push({ name: item['name'], cloud: item['cloud'],
+        //                       zone: item['zone'], host: item['host'],
+        //                       score: item['score'] });
+        //     });
+
+        //     res.json(result);
+        // });
     });
 });
 
@@ -70,16 +85,10 @@ router.post('/', urlencodedParser, function(req, res, next) {
                 w: 'majority',
                 j: true,
                 wtimeout: 10000
-            }, function(err, result) {
-                var returnStatus = '';
-
-                if (err) {
-                    console.log(err);
-                    returnStatus = 'error';
-                } else {
-                    console.log('Successfully inserted highscore');
-                    returnStatus = 'success';
-                }
+            }).then((result) => {
+                console.log('Successfully inserted highscore');
+                var returnStatus = 'success';
+                
 
                 res.json({
                     name: req.body.name,
@@ -88,6 +97,11 @@ router.post('/', urlencodedParser, function(req, res, next) {
                     level: userLevel,
                     rs: returnStatus
                 });
+                // }
+
+
+            }).catch(err => {
+                console.log(err)
             });
     });
 });
