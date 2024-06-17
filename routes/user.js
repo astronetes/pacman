@@ -121,7 +121,8 @@ router.get('/stats', function(req, res, next) {
         // Find all elements where the score field exists to avoid
         // undefined values
         var col = db.collection('userstats');
-        col.find({ score: {$exists: true}}).sort([['_id', 1]]).toArray((docs) => {
+        col.find({ score: {$exists: true}}).sort([['_id', 1]]).toArray()
+        .then(docs => {
 
             // function(err, docs) {
             var result = [];
